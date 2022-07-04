@@ -17,8 +17,15 @@ public class Worker {
             for (Method mtd : mtds) {
                 if (mtd.isAnnotationPresent(Saver.class)) {
                     try {
-                        tc.saveToFile(path);
+                        tc.saveToFileWithSerialize(path);
                     } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    try {
+                        tc.deserializeStringFromFile(path);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    } catch (ClassNotFoundException e) {
                         throw new RuntimeException(e);
                     }
                 }

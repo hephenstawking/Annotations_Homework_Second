@@ -1,10 +1,9 @@
 package annotations.homework;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.nio.file.Files;
 
 @Retention(RetentionPolicy.RUNTIME)
 @interface SavePath {
@@ -17,18 +16,24 @@ import java.lang.annotation.RetentionPolicy;
 }
 
 @SavePath(path = "some.txt")
-public class TextContainer {
+public class TextContainer implements Serializable {
     String str = "There is some string";
 
     @Saver
-    public void saveToFile (String path) throws IOException {
+    public void saveToFileWithSerialize (String path) throws IOException {
 
-        try(FileWriter fileWriter = new FileWriter(path, true);
-            PrintWriter pw = new PrintWriter(fileWriter);) {
-            pw.println(str);
+        try(FileOutputStream fout = new FileOutputStream(path);
+            ObjectOutputStream out = new ObjectOutputStream(fout);) {
+            out.writeObject(str);
         }  catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void deserializeStringFromFile (String path) throws IOException, ClassNotFoundException {
+        ObjectInputStream in = new ObjectInputStream(new FileInputStream(path));
+        String str = (String) in.readObject();
+        System.out.println(str);
     }
 
 }
